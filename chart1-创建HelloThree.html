@@ -14,14 +14,15 @@
 
 <body>
 	<script>
+		let scene, camera, renderer;
 		// 创建场景
-		const scene = new THREE.Scene();
+		scene = new THREE.Scene();
 		// 创建镜头
-		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 		
 		// 创建渲染器
-		const renderer = new THREE.WebGLRenderer();
-		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight);
 		// 将内容填充到 DOM 的 canvas 元素中
 		document.body.appendChild( renderer.domElement );
 
@@ -41,6 +42,33 @@
 			renderer.render( scene, camera );  // 渲染器根据场景、透视镜头来渲染画面，
 		}
 		animate();
+
+		// 随窗口改变大小
+		window.addEventListener('resize', onWindowResize);
+
+		// resizeObserver 监听元素大小变化
+		// setSize() 第 3 个参数的默认值为 true，当我们希望控制尺寸的主动权完全由 canvas 那么一定要设置第 3 个参数为 false。
+		// 分辨率策略
+		/*
+			1 	不做
+
+			2 	renderer.setPixelRatio(window.devicePixelRatio) (强烈不推荐)
+
+			3 	const canvas = renderer.domElement
+				const ratio = window.devicePixelRatio
+				const newWidth = Math.floor(canvas.clientWidth * ratio)
+				const newHeight = Math.floor(canvas.clientHeight * ratio)
+				renderer.setSize(newWidth,newHeight,false) //特别注意，第 3 个参数一定要为 false
+
+		*/
+
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}
+
 	</script>
 </body>
 
