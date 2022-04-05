@@ -7,12 +7,15 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
 	<style>
-		* { margin: 0; }
-			canvas {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
+		* {
+			margin: 0;
+		}
+
+		canvas {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
 	</style>
 </head>
 
@@ -30,7 +33,22 @@
 	</script>
 
 	<script type="module">
-		import { Scene, PerspectiveCamera, WebGLRenderer, MeshBasicMaterial, Mesh, BoxGeometry, BufferGeometry, Color, } from 'three';
+		import { 
+			Scene, 
+			PerspectiveCamera, 
+			WebGLRenderer,
+			PointLight, 
+			Group, 
+			LineBasicMaterial,
+			MeshPhongMaterial, 
+			Mesh, 
+			BoxGeometry, 
+			BufferGeometry,
+			WireframeGeometry, 
+			LineSegments, 
+			Float32BufferAttribute, 
+			DoubleSide, 
+			Color} from 'three';
 		import { GUI } from './libs/jsm/libs/lil-gui.module.min.js';
 		import { OrbitControls } from './libs/jsm/controls/OrbitControls.js';
 
@@ -39,15 +57,29 @@
 		gui = new GUI();
 
 		scene = new Scene();
-		scene.background = new Color( 0x444444 );
+		scene.background = new Color(0x444444);
 
-		camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 50 );
+
+		const lights = [];
+		lights[0] = new PointLight(0xffffff, 1, 0);
+		lights[1] = new PointLight(0xffffff, 1, 0);
+		lights[2] = new PointLight(0xffffff, 1, 0);
+
+		lights[0].position.set(0, 200, 0);
+		lights[1].position.set(100, 200, 100);
+		lights[2].position.set(- 100, - 200, - 100);
+
+		scene.add(lights[0]);
+		scene.add(lights[1]);
+		scene.add(lights[2]);
+
+		camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 50);
 		camera.position.z = 30;
 
-		renderer = new WebGLRenderer( { antialias: true } );
-		renderer.setPixelRatio( window.devicePixelRatio );
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		document.body.appendChild( renderer.domElement );
+		renderer = new WebGLRenderer({ antialias: true });
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
 
 		const data = {
 			width: 15,
@@ -57,47 +89,61 @@
 			heightSegments: 1,
 			depthSegments: 1
 		};
-
-
-
-		const geometry = new BoxGeometry(data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments)
-		const material = new MeshBasicMaterial( { color: 0x00ff00 } );
+		// const geometry = new BoxGeometry(data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments)
+		const lineMaterial = new LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
+		const material = new MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, side: DoubleSide, flatShading: true });
 		// 创建网格
-		const cube = new Mesh( geometry, material );
-		scene.add( cube );
-
-		const folder = gui.addFolder( 'THREE.BoxGeometry' );
-		folder.add( data, 'width', 1, 30 ).onChange( (e) => { generateGeometry(e, 'width')} );
-		folder.add( data, 'height', 1, 30 ).onChange( generateGeometry );
-		folder.add( data, 'depth', 1, 30 ).onChange( generateGeometry );
-		folder.add( data, 'widthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'heightSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'depthSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
+		const geometry = new BufferGeometry();
+		geometry.setAttribute('position', new Float32BufferAttribute([], 3));
 
 
-		function generateGeometry(val, key) {
-			cube.geometry[key] = val // ???
+		const lineSegments = new LineSegments(geometry, lineMaterial)
+		const cube = new Mesh(geometry, material);
+		// scene.add( cube );
+
+		const group = new Group();
+		group.add(lineSegments);
+		group.add(cube);
+
+		scene.add(group);
+
+		generateGeometry(cube)
+
+		const folder = gui.addFolder('THREE.BoxGeometry');
+		folder.add(data, 'width', 1, 30).onChange(generateGeometry);
+		folder.add(data, 'height', 1, 30).onChange(generateGeometry);
+		folder.add(data, 'depth', 1, 30).onChange(generateGeometry);
+		folder.add(data, 'widthSegments', 1, 10).step(1).onChange(generateGeometry);
+		folder.add(data, 'heightSegments', 1, 10).step(1).onChange(generateGeometry);
+		folder.add(data, 'depthSegments', 1, 10).step(1).onChange(generateGeometry);
+
+		function generateGeometry() {
+			updateGroupGeometry(group,
+				new BoxGeometry(
+					data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments
+				)
+			);
+		}
+		function updateGroupGeometry(_group, geometry) {
+			_group.children[0].geometry.dispose();
+			_group.children[1].geometry.dispose();
+
+			_group.children[0].geometry = new WireframeGeometry(geometry);
+			_group.children[1].geometry = geometry;
+
 		}
 
 		function render() {
-
-			requestAnimationFrame( render );
-
-			cube.rotation.x += 0.005;
-			cube.rotation.y += 0.005;
-
-			renderer.render( scene, camera );
-
+			requestAnimationFrame(render);
+			group.rotation.x += 0.005;
+			group.rotation.y += 0.005;
+			renderer.render(scene, camera);
 		}
-
-		window.addEventListener( 'resize', function () {
-
+		window.addEventListener('resize', function () {
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
-
-			renderer.setSize( window.innerWidth, window.innerHeight );
-
-		}, false );
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}, false);
 
 		render();
 
