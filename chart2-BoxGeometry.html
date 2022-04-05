@@ -81,6 +81,9 @@
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.body.appendChild(renderer.domElement);
 
+        const orbit = new OrbitControls( camera, renderer.domElement );
+        orbit.enableZoom = false;
+
 		const data = {
 			width: 15,
 			height: 15,
