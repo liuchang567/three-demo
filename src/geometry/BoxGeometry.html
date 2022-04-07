@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>BoxGeometry</title>
 	<style>
 		* {
 			margin: 0;
@@ -27,7 +27,7 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "./libs/three.module.js"
+				"three": "../../libs/three.module.js"
 			}
 		}
 	</script>
@@ -49,8 +49,8 @@
 			Float32BufferAttribute, 
 			DoubleSide, 
 			Color} from 'three';
-		import { GUI } from './libs/jsm/libs/lil-gui.module.min.js';
-		import { OrbitControls } from './libs/jsm/controls/OrbitControls.js';
+		import { GUI } from '../../libs/jsm/libs/lil-gui.module.min.js';
+		import { OrbitControls } from '../../libs/jsm/controls/OrbitControls.js';
 
 		let scene, camera, renderer, gui;
 
