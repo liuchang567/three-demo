@@ -49,6 +49,23 @@
 		} from 'three';
 		import { OrbitControls } from '../../libs/jsm/controls/OrbitControls.js';
 		import { GUI } from '../../libs/jsm/libs/lil-gui.module.min.js';
+		
+		// extends Object3D
+		/*Properties
+			autoUpdate : Boolean
+			background : Object
+			environment : Texture
+			fog : Fog
+			isScene : Boolean
+			overrideMaterial : Material
+		*/
+
+		/*Methods
+			toJSON(meta : Object) : Object
+			getObjectByName(name)
+			add()
+			remove()
+		*/
 
 		let scene, camera, renderer;
 
