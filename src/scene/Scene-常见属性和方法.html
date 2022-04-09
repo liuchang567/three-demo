@@ -62,9 +62,10 @@
 
 		/*Methods
 			toJSON(meta : Object) : Object
-			getObjectByName(name)
-			add()
-			remove()
+			getObjectByName(name, Boolean)
+      traverse(fun(obj))
+			add(Object)
+			remove(Object)
 		*/
 
 		let scene, camera, renderer;
@@ -152,7 +153,8 @@
 
 			//雾化
 			this.foggy = function () {
-				scene.fog = new Fog(0xffffff, 0.015, 100);
+				scene.fog = new Fog(0xffffff, 0.015, 100); // 雾化颜色, 雾化近处值, 雾化远处值
+        // FogExp2(0xffffff, 1) 雾化值
 			}
 		}
 
