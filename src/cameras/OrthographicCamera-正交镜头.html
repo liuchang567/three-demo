@@ -54,14 +54,21 @@
 		scene = new Scene();
 
     /*
-      透视镜头默认参数值：fov=50、aspect=1、near=0.1、far=2000
-      fov：摄像机视椎体垂直视野角度
-      aspect：摄像机视椎体长宽比(宽高比)
-      near：摄像机视椎体近端面
-      far：摄像机视椎体远端面
+      透视镜头默认参数值：-1, 1, 1, -1, 5, 50
+      left：视椎体左侧面
+      right：视椎体右侧面
+      top：视椎体顶面
+      bottom：视椎体底面
+      near：视椎体近端面
+      far：视椎体远端面
+      从实际的角度来看，一定要注意以下几点：
+
+      left 的值不能大于 right，同理 top 的值不能大于 bottom
+      near 设置越小，投影的映像越大
+      left 与 right 之间的距离、top 与 bottom 之间的距离的比例一定要和 canvas 比例相同，否则会导致投影的物体形状变形
 
       渲染时
-      camera.aspect = newAspect
+      camera.left = - new Aspect、camera.right = new Aspect
     */
 		camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
 		camera.position.set(-100, 50, 80)
