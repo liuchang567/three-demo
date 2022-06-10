@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Scene-场景属性&方法</title>
+	<style>
+		* {
+			margin: 0;
+		}
+
+		canvas {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../../libs/three.module.js"
+			}
+		}
+	</script>
+
+	<script type="module">
+		import {
+			Scene,
+			PerspectiveCamera,
+			WebGLRenderer,
+			AmbientLight,
+      PointLight,
+			SpotLight,
+			MeshPhongMaterial,
+			MeshLambertMaterial,
+			Mesh,
+			BoxGeometry,
+      SphereBufferGeometry,
+			PlaneGeometry,
+			Fog,
+			Color,
+      Object3D,
+      SphereGeometry,
+      MeshStandardMaterial,
+      TextureLoader,
+      CameraHelper,
+      AxesHelper,
+      BoxHelper
+		} from 'three';
+		import { OrbitControls } from '../../libs/jsm/controls/OrbitControls.js';
+		import { GUI } from '../../libs/jsm/libs/lil-gui.module.min.js';
+		
+
+
+		let scene, camera, renderer;
+
+		scene = new Scene();
+
+		camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+		renderer = new WebGLRenderer({ antialias: true });
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+    const orbit = new OrbitControls( camera, renderer.domElement );
+
+    // const helper = new CameraHelper(camera);
+    // scene.add(helper);
+
+
+    const axesHelper = new AxesHelper(1000); 
+    scene.add(axesHelper);
+
+
+    const loader = new TextureLoader()
+    const bgTexture = loader.load('../img/stars.jpg');
+    scene.background = bgTexture;
+
+
+    const ambientLight = new AmbientLight(0xFFFFFF);
+		scene.add(ambientLight);
+
+
+    function bgTextureResize() {
+      const canvasAspect = window.innerWidth / window.innerHeight;
+      const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+      const aspect = imageAspect / canvasAspect;
+      
+      bgTexture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
+      bgTexture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+      
+      bgTexture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
+      bgTexture.repeat.y = aspect > 1 ? 1 : aspect;
+    }
+
+    
+    let earthOrbit = new Object3D();
+    let earth
+
+    loader.load( '../img/2_no_clouds_8k_recolor.jpg', function ( texture ) {
+      let earthGgeometry = new SphereGeometry(160, 100, 100);
+      let earthMaterial = new MeshStandardMaterial( { map: texture } );
+      earth = new Mesh( earthGgeometry, earthMaterial );
+      camera.position.z = 500;
+      
+      const boxHelper = new BoxHelper(earth); 
+      scene.add(boxHelper);
+      
+      earthOrbit.add(earth);
+
+      scene.add(earthOrbit);
+    });
+
+    
+
+
+
+
+		function render(time) {
+      time = time * 0.00005;
+      earthOrbit.rotation.y = time;
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+		}
+		window.addEventListener('resize', function () {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+      // bgTextureResize()
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}, false);
+
+
+		render();
+
+	</script>
+</body>
+
+</html>
