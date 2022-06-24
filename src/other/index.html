@@ -97,7 +97,7 @@
     // scene.add(sun);
 
     const light = new DirectionalLight(0xffffff, 1);
-    light.position.set(0, 0, 700);
+    light.position.set(0, 300, 700);
     scene.add(light);
 
 
@@ -123,7 +123,7 @@
     let earthOrbit = new Object3D();
     let earth
 
-    let earthGgeometry = new SphereGeometry(100, 32, 32);
+    let earthGgeometry = new SphereGeometry(260, 32, 32);
     let earthMaterial = new MeshPhongMaterial( {
       map: loader.load( '../img/2_no_clouds_8k_recolor.jpg'),
       // 镜面反射
@@ -173,26 +173,28 @@
     noiseTexture.wrapS = RepeatWrapping
     noiseTexture.wrapT = RepeatWrapping
 
-    var flowMaterial = new ShaderMaterial({
-      uniforms: {
-        fTexture: {
-          value: cloudsTexture,  
-        },
-        nTexture: {
-          value: noiseTexture,
-        },
-        time: {
-          value: 0.0
-        },
-      },
-      // 顶点着色器
-      vertexShader: VSHADER_SOURCE,
-      // 片元着色器
-      fragmentShader: FSHADER_SOURCE,
-      transparent: true
+    var flowMaterial = new MeshPhongMaterial({
+      map: cloudsTexture,
+      // uniforms: {
+      //   fTexture: {
+      //     value: cloudsTexture,  
+      //   },
+      //   nTexture: {
+      //     value: noiseTexture,
+      //   },
+      //   time: {
+      //     value: 0.0
+      //   },
+      // },
+      // // 顶点着色器
+      // vertexShader: VSHADER_SOURCE,
+      // // 片元着色器
+      // fragmentShader: FSHADER_SOURCE,
+      transparent: true,
+      opacity: 0.3
     })
 
-    let earthGgeometry2 = new SphereGeometry(100.01, 32, 32);
+    let earthGgeometry2 = new SphereGeometry(261, 32, 32);
 
     var earth2 = new Mesh( earthGgeometry2, flowMaterial );
     
@@ -211,7 +213,7 @@
 
 
 		function render(time) {
-      time = time * 0.0005;
+      time = time * 0.0001;
       earthOrbit.rotation.y = time;
 			requestAnimationFrame(render);
 			renderer.render(scene, camera);
