@@ -122,7 +122,7 @@
     let earth
 
 
-    let earthGgeometry = new SphereGeometry(5, 40, 40);
+    let earthGgeometry = new SphereGeometry(8, 40, 40);
     let earthMaterial = new MeshPhongMaterial({
       map: loader.load('../img/2_no_clouds_8k_recolor.jpg'),
       // 镜面反射
@@ -167,7 +167,7 @@
           gl_FragColor = vec4(glowColor, intensity);
         }
     `
-    let earthGlowGgeometry = new SphereGeometry(5, 40, 40);
+    let earthGlowGgeometry = new SphereGeometry(8, 40, 40);
     let earthGlowMaterial = new ShaderMaterial({
       uniforms: {
         c: {
@@ -200,7 +200,7 @@
     })
 
 
-    let earthGgeometry2 = new SphereGeometry(5.1, 40, 40);
+    let earthGgeometry2 = new SphereGeometry(8.1, 40, 40);
 
     var earth2 = new Mesh(earthGgeometry2, flowMaterial);
 
