@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MeshBasicMaterial-网格基础材质</title>
+	<style>
+		* {
+			margin: 0;
+		}
+
+		canvas {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../../libs/three.module.js"
+			}
+		}
+	</script>
+
+	<script type="module">
+		import {
+			Scene,
+			PerspectiveCamera,
+			WebGLRenderer,
+			AmbientLight,
+			SpotLight,
+			MeshBasicMaterial,
+			Mesh,
+      BoxGeometry,
+			PlaneGeometry,
+      CameraHelper
+		} from 'three';
+		import { OrbitControls } from '../../libs/jsm/controls/OrbitControls.js';
+		
+
+
+		let scene, camera, renderer;
+
+		scene = new Scene();
+
+    /*
+      透视镜头默认参数值：fov=50、aspect=1、near=0.1、far=2000
+      fov：摄像机视椎体垂直视野角度
+      aspect：摄像机视椎体长宽比(宽高比)
+      near：摄像机视椎体近端面
+      far：摄像机视椎体远端面
+
+      渲染时
+      camera.aspect = newAspect
+    */
+		camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera.position.set(-100, 50, 80)
+
+		renderer = new WebGLRenderer({ antialias: true });
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+
+		//添加环境光
+		const ambientLight = new AmbientLight(0x0c0c0c);
+		scene.add(ambientLight);
+
+		//添加聚光灯光源
+		const spotLight = new SpotLight(0xffffff);
+		spotLight.position.set(-40, 60, -10);
+		spotLight.castShadow = true;
+		scene.add(spotLight);
+
+
+		//创建一个平面 方便查看
+		const planeGeometry = new PlaneGeometry(100, 100);
+		const planeMaterial = new MeshBasicMaterial({ color: 0xffffff });
+		const plane = new Mesh(planeGeometry, planeMaterial);
+		plane.receiveShadow = true;
+		//设置平面的旋转角度和位置
+		plane.rotation.x = -0.5 * Math.PI;
+		plane.position.x = 0;
+		plane.position.y = -4;
+		plane.position.z = 0;
+		//将平面添加场景中
+		scene.add(plane);
+
+
+    const cubeGeometry = new BoxGeometry(4, 4, 4);
+		const cubeMaterial = new MeshBasicMaterial({ 
+			// id //（标识符）	 用来识别材质，并在材质创建时赋值。第一个材质的值从 0 开始，每新加一个材质，这个值就增加 1。
+			uuid: 11111, //（通用唯一识别码）	 这是生成的唯一 ID，在内部使用。
+			name: 'MeshBasicMaterial', //（名称）	 可以通过这个属性赋予材质名称，用于调试的目的。
+			opacity: 1, //（不透明度）	 定义物体的透明度。与 transparent 属性一起使用。该属性的赋值范围从 0 到 1。
+			transparent: true,
+			//（是否透明）	
+			// 如果该值设置为 true，Three.js 会使用指定的不透明度渲染物体。
+			// 如果设置为 false，这个物体就不透明（只是着色更明亮些）。
+			// 如果使用 alpha（透明度）通道的纹理，该属性应该设置为 true。
+			overdraw: true, //（过度描绘）	 当你使用 THREE.CanvasRender 时，多边形会被渲染得稍微大一点。当使用这个渲染器渲染的物体有间隙时，可以将这个属性设置为 true。
+			visible: true, //（是否可见）	 定义该材质是否可见。如果设置为 false,那么在场景中就看不到该物体。
+			// side: THREE.FrontSide,
+			// （侧面）	  通过这个属性，可以定义几何体的哪一面应用材质。
+			// 默认值为 THREE.FrontSide（前面），这样可以将材质应用到物体的前面（外侧）。
+			// 也可以将其设置为 THREE.BackSide（后面），这样可以将材质应用到物体的后面（内侧）。
+			// 或者也可以将它设置为 THREE.DoubleSide（双侧），可将材质应用到物体的内外两侧。
+			// needsUpda: true,
+			color: Math.random() * 0xffffff,
+
+			// blending（融合）	 该属性决定物体上的材质如何与背景融合。一般的融合模式是 THREE.NormalBlending，在这种模式下只显示材质的上层。。
+		  //  blendsrc（融合源）	 除了使用标准融合模式之外，还可以通过设置 blendsrc、 blenddst 和 blendequation 来创建自定义的融合模式。
+			// 这个属性定义了该物体（源）如何与背景（目标）相融合。默认值为 THREE.SrcAlphaFactor，即使用 alpha(透明度）通道进行融合。
+			//  blenddst（融合目标）	 这个属性定义了融合时如何使用背景（目标），默认值为 THREE.OneMinusSrcAlphaFactor，其含义是目标也使用源的 alpha 通道进行融合，只是使用的值是 1（源的 alpha 通道值）。
+			//  blendequation（融合公式）	 定义了如何使用 blendsrc 和 blenddst 的值。默认值为使它们相加（AddEquation）。通过使用这三个属性，可以创建自定义的融合模式。
+			// 	depthTest	 这是一个高级 WebGL 属性。使用这个属性可以打开或关闭 GL_DEPTH_TEST 参数。此参数控制是否使用像素深度来计算新像素的值。通常情况下不必修改这个属性。更多信息可以在 OpenGL 规范中找到。
+			//  depthWrite	 这是另外一个内部属性。这个属性可以用来决定这个材质是否影响 WebGL 的深度缓存。如果你将一个物体用作二维贴图（例如一个套子），应该将这个属性设置为 false。但是，通常不应该修改这个属性。
+			//  polygonOffset
+			//  polygonOffsetFactor
+			//  polygonOffsetUnits	 通过这些属性，可以控制 WebGL 的 POLYGON_OFFSET_FILL 特性。一般不需要使用它们。有关这些属性具体做什么的解释，可以参考 OpenGL 规范。
+			//  alphatest	 可以给这个属性指定一个值（从 0 到 1）。如果某个像素的 alpha 值小于该值，那么该像素不会显示出来。可以使用这个属性移除一些与透明度相关的毛边。
+		})
+		const cube = new Mesh(cubeGeometry, cubeMaterial)
+
+		cube.position.x = 0
+		cube.position.y = 0;
+		cube.position.z = 0
+
+
+		scene.add(cube)
+
+		const orbit = new OrbitControls(camera, renderer.domElement);
+
+
+
+		function render(time) {
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+		}
+		window.addEventListener('resize', function () {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}, false);
+
+		render();
+
+	</script>
+</body>
+
+</html>
